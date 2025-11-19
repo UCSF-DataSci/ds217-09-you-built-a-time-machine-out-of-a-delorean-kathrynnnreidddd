@@ -1,0 +1,21 @@
+
+TIME ZONE HANDLING REPORT
+
+1. Original Timezone:
+The original patient_vitals dataset contained naive datetime values (i.e., without timezone information). This is common in clinical datasets collected from different study sites, where timestamps are typically recorded in local time without explicit timezone context.
+
+2. Localization Method:
+To ensure global consistency, I localized all datetimes to Coordinated Universal Time (UTC) using the pandas `.tz_localize('UTC')` function. This operation adds timezone awareness to otherwise naive timestamps without altering their actual clock time values.
+
+3. Conversion:
+Once localized, I converted the timestamps to US Eastern Time (`.tz_convert('US/Eastern')`) to align with clinical operations conducted in that region. This conversion automatically adjusts the UTC times to reflect the local Eastern time offset, including daylight saving transitions.
+
+4. DST Handling:
+A specific example was chosen for March 12, 2023, 10:00 UTC — the date when US Eastern time transitions to Daylight Saving Time (DST). When converted, this timestamp correctly shifts to 06:00 in Eastern Time. UTC avoids DST ambiguity entirely since it does not adjust for DST changes. This property makes UTC ideal for storing primary timestamps in clinical databases, while conversions to local zones can be done dynamically for site-level reporting.
+
+5. Example:
+Example before conversion: 2023-03-12 10:00:00+00:00 (UTC)
+Example after conversion: 2023-03-12 06:00:00-04:00 (US/Eastern)
+
+6. Rationale:
+Using UTC as the base timezone ensures temporal consistency across international sites and prevents confusion caused by regional DST changes or daylight shifts. Local conversions can then be made as needed, avoiding the risk of misalignment in time-based analyses.
