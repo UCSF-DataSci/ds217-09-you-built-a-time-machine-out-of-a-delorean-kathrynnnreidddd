@@ -1,0 +1,63 @@
+
+1. Number of Missing Values
+After upsampling monthly patient vital signs to daily frequency, each variable contained 323 missing values. Since the resulting time series had 365 days and only 12 month-end observations, approximately 88.5% of all values were missing. This high percentage is expected because daily rows are created where no data originally existed.
+2. Percentage Missing  
+The missingness proportion was consistent across all vital-sign features (temperature, heart rate, blood pressure, weight). Each variable had 323 missing values out of 365 rows, resulting in 88.5% missingness.
+
+3. Imputation Methods Used  
+I tested four approaches:  
+    - Forward fill (ffill)  
+    - Backward fill (bfill)  
+    - Linear and time-based interpolation  
+    - Rolling-mean imputation  
+The primary method ultimately selected was forward fill.
+
+4. Rationale for the Selected Method  
+Forward fill was chosen because monthly vital signs typically change gradually rather than abruptly. Forward fill preserves realistic physiological stability across days while avoiding artificial assumptions about how the values should evolve within a month. It is also transparent, easy to interpret, and avoids over-smoothing.
+
+5. Pros and Cons of the Approach  
+Pros:
+   - Simple and intuitive  
+   - Preserves real observed values  
+   - Creates stable daily continuity  
+   - Avoids artificial trends from interpolation  
+Cons:
+   - Assumes vitals remain stable through the month  
+   - Cannot model true day-to-day variation  
+   - May smooth away meaningful short-term changes  
+
+6. Missing Data Patterns  
+The missingness was entirely structural, not random. All missing values occur on non–month-end days, producing a regular block-pattern of gaps. Grouping missing counts by month confirmed that every month except the final day showed missingness. Similarly, grouping by day of week showed an even distribution, further confirming that the missingness pattern is driven by date frequency, not patient events.
+
+7. Example Before/After Imputation  
+Before imputation, most days in the series contained NaN values. After applying forward fill, each gap was filled with the most recent known monthly measurement, producing a complete and continuous daily time series.
+
+
+
+Missing patterns summary:
+Missing by month:
+date
+1      0
+2     27
+3     30
+4     29
+5     30
+6     29
+7     30
+8     30
+9     29
+10    30
+11    29
+12    30
+Name: temperature, dtype: int64
+
+Missing by day of week (0=Mon, 6=Sun):
+date
+0    46
+1    45
+2    47
+3    46
+4    46
+5    47
+6    46
+Name: temperature, dtype: int64
